@@ -36,6 +36,11 @@ import requests
 from pydub import AudioSegment
 import soxr
 import numpy as np
+import serial
+import time
+
+ser = serial.Serial('/dev/ttyACM0', 115200)
+time.sleep(2)
 
 # ------------------- TIMING UTILITY -------------------
 class Timer:
@@ -182,6 +187,9 @@ def query_ollama():
 
     response = json.loads(response[response.find("{"):response.rfind("}")+1])
 
+    if "action" in response:
+        sendToArduino(response["action"])
+
     return response['reponse']
 
 # ------------------- TTS & DEGRADATION -------------------
@@ -264,6 +272,9 @@ def play_response(text):
         finally:
             mic_enabled = True      # 🔊 unmute mic
             time.sleep(0.3)         # optional: small cooldown
+
+def sendToArduino(cmd):
+    ser.write((cmd + "\n").encode())
 
 
 # ------------------- PROCESSING LOOP -------------------
