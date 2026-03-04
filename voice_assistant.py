@@ -36,6 +36,8 @@ import requests
 from pydub import AudioSegment
 import soxr
 import numpy as np
+import sys
+
 
 # ------------------- TIMING UTILITY -------------------
 class Timer:
@@ -172,19 +174,38 @@ def query_ollama():
 
 
     with Timer("Inference"):  # measure inference latency
-        resp = ollama.generate(
-            model=MODEL_NAME,
-            prompt=json.dumps(messages[-HISTORY_LENGTH:]),
-            keep_alive=-1
-        )
+        url = "http://11.0.0.7:11434/api/generate"
 
-    response = resp['response']
+        payload = {
+    	    "model": "robot-assistant",
+    	    "prompt": json.dumps(messages[-HISTORY_LENGTH:]),
+    	    "stream": False
+	}
+
+        resp = requests.post(url, json=payload)
+
+    response = resp.json()['response']
     print(f'[Debug] Ollama status: {response}')
 
     response = json.loads(response[response.find("{"):response.rfind("}")+1])
 
+
+    if "action" in response:
+        sendToArduino(response["action"])
+
+
     return response['reponse']
 
+
+
+def sendToArduino(cmd):
+    import serial
+
+
+    ser = serial.Serial('/dev/ttyACM0', 115200)
+    ser.write('allumerLed\n'.encode())
+
+    ser.close()
 # ------------------- TTS & DEGRADATION -------------------
 
 import tempfile
@@ -307,7 +328,7 @@ def processing_loop():
                     messages.append({"role": "assistant", "content": clean_debug_text})
 
                     # TTS generation + playback
-                    #play_response(resp_text)
+                    play_response(resp_text)
                 else:
                     print('[Debug] Empty response, skipping TTS.')
 
