@@ -38,6 +38,16 @@ import soxr
 import numpy as np
 import sys
 
+import pyttsx3
+import re
+
+engine = pyttsx3.init()
+
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[0].id)  # change index ici
+engine.setProperty('rate', 160)
+engine.setProperty('volume', 1.0)
+
 
 # ------------------- TIMING UTILITY -------------------
 class Timer:
@@ -174,7 +184,7 @@ def query_ollama():
 
 
     with Timer("Inference"):  # measure inference latency
-        url = "http://11.0.0.7:11434/api/generate"
+        url = "http://localhost:11434/api/generate"
 
         payload = {
     	    "model": "robot-assistant",
@@ -208,84 +218,22 @@ def sendToArduino(cmd):
     ser.close()
 # ------------------- TTS & DEGRADATION -------------------
 
-import tempfile
 
 def play_response(text):
-    import io
-    import tempfile
+    clean = re.sub(r"[\*]+", '', text)
+    clean = re.sub(r"\(.*?\)", '', clean)
+    clean = re.sub(r"<.*?>", '', clean)
+    clean = clean.replace('\n', ' ').strip()
+    clean = re.sub(r'\s+', ' ', clean)
+    clean = re.sub(r'[\U0001F300-\U0001FAFF\u2600-\u26FF\u2700-\u27BF]+', '', clean)
 
-    # Mute the mic during playback to avoid feedback loop
-    global mic_enabled
-    mic_enabled = False  # 🔇 mute mic
-
-    # clean the response
-    clean = re.sub(r"[\*]+", '', text)                # remove asterisks
-    clean = re.sub(r"\(.*?\)", '', clean)             # remove (stage directions)
-    clean = re.sub(r"<.*?>", '', clean)               # remove HTML-style tags
-    clean = clean.replace('\n', ' ').strip()          # normalize newlines
-    clean = re.sub(r'\s+', ' ', clean)                # collapse whitespace
-    clean = re.sub(r'[\U0001F300-\U0001FAFF\u2600-\u26FF\u2700-\u27BF]+', '', clean)  # remove emojis
-
-    piper_path = os.path.join(BASE_DIR, 'bin', 'piper', 'piper')
-
-    # 1. Generate Piper raw PCM
-    with Timer("Piper inference"):
-        piper_proc = subprocess.Popen(
-            [piper_path, '--model', VOICE_MODEL, '--output_raw'],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL
-        )
-        tts_pcm, _ = piper_proc.communicate(input=clean.encode())
-
-    # No FX: just convert raw PCM to WAV
-    pcm_to_wav = subprocess.Popen(
-        ['sox', '-t', 'raw', '-r', '16000', '-c', str(CHANNELS), '-b', '16',
-         '-e', 'signed-integer', '-', '-t', 'wav', '-'],
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL
-    )
-    tts_wav_16k, _ = pcm_to_wav.communicate(input=tts_pcm)
-
-    resample_proc = subprocess.Popen(
-        ['sox', '-t', 'wav', '-', '-r', '48000', '-t', 'wav', '-'],
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL
-    )
-    final_bytes, _ = resample_proc.communicate(input=tts_wav_16k)
-
-    # 7. Playback
     with Timer("Playback"):
-        try:
-            wf = wave.open(io.BytesIO(final_bytes), 'rb')
-
-
-            pa = pyaudio.PyAudio()
-            stream = pa.open(
-                format=pa.get_format_from_width(wf.getsampwidth()),
-                channels=wf.getnchannels(),
-                rate=wf.getframerate(),
-                output=True
-            )
-
-            data = wf.readframes(CHUNK)
-            while data:
-                stream.write(data)
-                data = wf.readframes(CHUNK)
-
-            stream.stop_stream()
-            stream.close()
-            pa.terminate()
-            wf.close()
-
-        except wave.Error as e:
-            print(f"[Error] Could not open final WAV: {e}")
-        
-        finally:
-            mic_enabled = True      # 🔊 unmute mic
-            time.sleep(0.3)         # optional: small cooldown
+        subprocess.run([
+            'python3', '-c',
+            f'import pyttsx3; e=pyttsx3.init(); e.setProperty("rate",160); e.say("{clean}"); e.runAndWait()'
+        ])
+    time.sleep(0.3)
+            
 
 
 # ------------------- PROCESSING LOOP -------------------
