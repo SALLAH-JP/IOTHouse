@@ -18,9 +18,9 @@ app = Flask(__name__, static_folder='.')
 # ─────────────────────────────────────────────
 # CONFIG
 # ─────────────────────────────────────────────
-ARDUINO_PORT = os.environ.get('ARDUINO_PORT', 'COM3')   # Pi: '/dev/ttyACM0'
+ARDUINO_PORT = '/dev/ttyACM0'
 ARDUINO_BAUD = 115200
-OLLAMA_HOST  = 'http://localhost:11434'
+OLLAMA_HOST  = 'http://11.0.0.34:11434'
 OLLAMA_URL   = f'{OLLAMA_HOST}/api/chat'
 OLLAMA_MODEL = 'qwen2.5:1.5b'
 TTS_DIR      = os.path.join(os.path.dirname(__file__), 'tts_cache')
@@ -102,21 +102,20 @@ def init_arduino():
         arduino = None
 
 def send_to_arduino(cmd: str):
-    global arduino
-    if arduino is None:
-        print(f'[Arduino] Ignoré (non connecté) : {cmd}')
-        return None
+
     try:
-        arduino.reset_input_buffer()
-        arduino.write((cmd + '\n').encode())
-        response = arduino.readline().decode().strip()
+        import serial
+        ser = serial.Serial(ARDUINO_PORT, ARDUINO_BAUD, timeout=1)
+        time.sleep(2)
+        ser.write((cmd + '\n').encode())
+        ser.close()
+
         print(f'[Arduino] ← {cmd}')
-        print(f'[Arduino] → {response}')
-        return response
+        return True
+
     except Exception as e:
         print(f'[Arduino] Erreur : {e}')
-        arduino = None
-        return None
+        return False
 
 # ─────────────────────────────────────────────
 # TTS
@@ -275,4 +274,5 @@ if __name__ == '__main__':
     print(f'TTS dir : {TTS_DIR}')
     print('=' * 50)
 
-    app.run(host='0.0.0.0', port=5000, debug=False, ssl_context='adhoc')
+    app.run(host='0.0.0.0', port=5000, debug=False,
+        ssl_context=('cert.pem', 'key.pem'))
