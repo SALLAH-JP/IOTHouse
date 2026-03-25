@@ -1,12 +1,16 @@
 // LED Salon RGB
 const int LED_R = 2;
 const int LED_G = 3;
-const int LED_B = 11;
+const int LED_B = 4;
 
 // LEDs simples
-const int LED_CHAMBRE = 4;
 const int LED_CUISINE = 7;
-const int LED_GARAGE  = 8;
+//const int LED_GARAGE  = 8;
+
+// LED Chambre RGB
+const int LED_CHAMBRE_R = 10;
+const int LED_CHAMBRE_G = 11;
+const int LED_CHAMBRE_B = 12;
 
 // Moteur 1 : Ventilateur
 const int M1_IN1 = 9;
@@ -22,9 +26,10 @@ void setup() {
   pinMode(LED_R, OUTPUT);
   pinMode(LED_G, OUTPUT);
   pinMode(LED_B, OUTPUT);
-  pinMode(LED_CHAMBRE, OUTPUT);
+  pinMode(LED_CHAMBRE_R, OUTPUT);
+  pinMode(LED_CHAMBRE_G, OUTPUT);
+  pinMode(LED_CHAMBRE_B, OUTPUT);
   pinMode(LED_CUISINE, OUTPUT);
-  pinMode(LED_GARAGE,  OUTPUT);
   pinMode(M1_IN1, OUTPUT);
   //pinMode(M1_IN2, OUTPUT);
   pinMode(M2_IN1, OUTPUT);
@@ -34,9 +39,10 @@ void setup() {
   digitalWrite(LED_R, HIGH);
   digitalWrite(LED_G, HIGH);
   digitalWrite(LED_B, HIGH);
-  digitalWrite(LED_CHAMBRE, HIGH);
+  digitalWrite(LED_CHAMBRE_R, HIGH);
+  digitalWrite(LED_CHAMBRE_G, HIGH);
+  digitalWrite(LED_CHAMBRE_B, HIGH);
   digitalWrite(LED_CUISINE, HIGH);
-  digitalWrite(LED_GARAGE,  HIGH);
   digitalWrite(M1_IN1, LOW);
   //digitalWrite(M1_IN2, LOW);
   digitalWrite(M2_IN1, LOW);
@@ -91,11 +97,15 @@ void loop() {
 
     // ── LEDs simples ──
     else if (msg == "allumerLedChambre") {
-      digitalWrite(LED_CHAMBRE, LOW);
+      digitalWrite(LED_CHAMBRE_R, LOW);
+      digitalWrite(LED_CHAMBRE_G, LOW);
+      digitalWrite(LED_CHAMBRE_B, LOW);
       Serial.println("OK:LED_CHAMBRE_ON");
     }
     else if (msg == "eteindreLedChambre") {
-      digitalWrite(LED_CHAMBRE, HIGH);
+      digitalWrite(LED_CHAMBRE_R, HIGH);
+      digitalWrite(LED_CHAMBRE_G, HIGH);
+      digitalWrite(LED_CHAMBRE_B, HIGH);
       Serial.println("OK:LED_CHAMBRE_OFF");
     }
     else if (msg == "allumerLedCuisine") {
@@ -106,32 +116,28 @@ void loop() {
       digitalWrite(LED_CUISINE, HIGH);
       Serial.println("OK:LED_CUISINE_OFF");
     }
-    else if (msg == "allumerLedGarage") {
-      digitalWrite(LED_GARAGE, LOW);
-      Serial.println("OK:LED_GARAGE_ON");
-    }
-    else if (msg == "eteindreLedGarage") {
-      digitalWrite(LED_GARAGE, HIGH);
-      Serial.println("OK:LED_GARAGE_OFF");
-    }
 
     // ── Tout allumer / éteindre ──
     else if (msg == "allumerTout") {
       digitalWrite(LED_R, LOW);
       digitalWrite(LED_G, LOW);
       digitalWrite(LED_B, LOW);
-      digitalWrite(LED_CHAMBRE, LOW);
+      digitalWrite(LED_CHAMBRE_R, LOW);
+      digitalWrite(LED_CHAMBRE_G, LOW);
+      digitalWrite(LED_CHAMBRE_B, LOW);
       digitalWrite(LED_CUISINE, LOW);
-      digitalWrite(LED_GARAGE,  LOW);
+      analogWrite(M1_IN1, 60);
       Serial.println("OK:TOUT_ON");
     }
     else if (msg == "eteindreTout") {
       digitalWrite(LED_R, HIGH);
       digitalWrite(LED_G, HIGH);
       digitalWrite(LED_B, HIGH);
-      digitalWrite(LED_CHAMBRE, HIGH);
+      digitalWrite(LED_CHAMBRE_R, HIGH);
+      digitalWrite(LED_CHAMBRE_G, HIGH);
+      digitalWrite(LED_CHAMBRE_B, HIGH);
       digitalWrite(LED_CUISINE, HIGH);
-      digitalWrite(LED_GARAGE,  HIGH);
+      digitalWrite(M1_IN1, LOW);
       Serial.println("OK:TOUT_OFF");
     }
 

@@ -20,9 +20,9 @@ app = Flask(__name__, static_folder='.')
 # ─────────────────────────────────────────────
 ARDUINO_PORT = '/dev/ttyACM0'
 ARDUINO_BAUD = 115200
-OLLAMA_HOST  = 'http://11.0.0.34:11434'
+OLLAMA_HOST  = 'http://11.0.0.10:11434'
 OLLAMA_URL   = f'{OLLAMA_HOST}/api/chat'
-OLLAMA_MODEL = 'qwen2.5:1.5b'
+OLLAMA_MODEL = 'domotique-assistant'
 TTS_DIR      = os.path.join(os.path.dirname(__file__), 'tts_cache')
 HISTORY_LEN  = 6
 
