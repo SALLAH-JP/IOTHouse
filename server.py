@@ -20,9 +20,9 @@ app = Flask(__name__, static_folder='.')
 # ─────────────────────────────────────────────
 ARDUINO_PORT = '/dev/ttyACM0'
 ARDUINO_BAUD = 115200
-OLLAMA_HOST  = 'http://11.0.0.10:11434'
+OLLAMA_HOST  = 'http://localhost:11434'
 OLLAMA_URL   = f'{OLLAMA_HOST}/api/chat'
-OLLAMA_MODEL = 'domotique-assistant'
+OLLAMA_MODEL = 'mistral-large-3:675b-cloud'
 TTS_DIR      = os.path.join(os.path.dirname(__file__), 'tts_cache')
 HISTORY_LEN  = 6
 
@@ -50,8 +50,8 @@ ACTION_STATE = {
     'eteindreLedCuisine': ('cuisine',      False),
     'allumerLedGarage':   ('garage-light', True),
     'eteindreLedGarage':  ('garage-light', False),
-    'allumerMoteur':      ('fan',          True),
-    'eteindreMoteur':     ('fan',          False),
+    'allumerVentilo':     ('fan',          True),
+    'eteindreVentilo':    ('fan',          False),
     'ventiloLent':        ('fan',          True),
     'ventiloRapide':      ('fan',          True),
     'ouvrirGarage':       ('garage-door',  True),
@@ -63,26 +63,33 @@ ACTION_STATE = {
 }
 
 SYSTEM_PROMPT = """Tu es un assistant domotique pour une maison connectée.
-Réponds UNIQUEMENT en JSON valide, sans texte avant ni après, sans balises markdown.
+Réponds UNIQUEMENT en JSON valide, sans texte avant ni après, sans balises markdown, avec une seul action.
 
 Si c'est une commande domotique, réponds :
-{"type":"commande","reponse":"<confirmation courte>","action":"<action>","parametres":{"pièce":"<pièce>"}}
+{"type":"commande","reponse":"<confirmation courte>","action":"<action>"}
 
 Actions disponibles :
-- allumerLed / eteindreLed           → salon (RGB)
-- allumerLedChambre / eteindreLedChambre
-- allumerLedCuisine / eteindreLedCuisine
-- allumerLedGarage  / eteindreLedGarage
-- allumerTout / eteindreTout
-- salonRouge / salonVert / salonBleu / salonBlanc
-- allumerMoteur / eteindreMoteur     → ventilateur
-- ventiloLent / ventiloRapide
-- ouvrirGarage / fermerGarage
-
-Pièces disponibles : salon, chambre, cuisine, garage
+- allumerLed
+- eteindreLed
+- allumerLedChambre
+- eteindreLedChambre
+- allumerLedCuisine
+- eteindreLedCuisine
+- allumerTout
+- eteindreTout
+- salonRouge
+- salonVert
+- salonBleu
+- salonBlanc
+- allumerVentilo
+- eteindreVentilo
+- ventiloLent
+- ventiloRapide
+- ouvrirGarage
+- fermerGarage
 
 Si ce n'est pas une commande, réponds :
-{"type":"chat","reponse":"<réponse courte en français>"}"""
+{"type":"chat","reponse":"<réponse moyennement courte en français>"}"""
 
 # ─────────────────────────────────────────────
 # ARDUINO
@@ -102,19 +109,20 @@ def init_arduino():
         arduino = None
 
 def send_to_arduino(cmd: str):
-
+    global arduino
+    if arduino is None:
+        print(f'[Arduino] Ignoré (non connecté) : {cmd}')
+        return False
     try:
-        import serial
-        ser = serial.Serial(ARDUINO_PORT, ARDUINO_BAUD, timeout=1)
-        time.sleep(2)
-        ser.write((cmd + '\n').encode())
-        ser.close()
-
+        arduino.reset_input_buffer()
+        arduino.write((cmd + '\n').encode())
+        response = arduino.readline().decode().strip()
         print(f'[Arduino] ← {cmd}')
+        print(f'[Arduino] → {response}')
         return True
-
     except Exception as e:
         print(f'[Arduino] Erreur : {e}')
+        arduino = None
         return False
 
 # ─────────────────────────────────────────────
@@ -211,10 +219,10 @@ def send_text():
     # Màj house_state + envoyer à l'Arduino
     if action:
         if action == 'allumerTout':
-            for r in ['salon', 'chambre', 'cuisine', 'garage-light']:
+            for r in ['salon', 'chambre', 'cuisine', 'fan']:
                 house_state[r] = True
         elif action == 'eteindreTout':
-            for r in ['salon', 'chambre', 'cuisine', 'garage-light']:
+            for r in ['salon', 'chambre', 'cuisine', 'fan']:
                 house_state[r] = False
         elif action in ACTION_STATE:
             room, on = ACTION_STATE[action]
@@ -261,18 +269,18 @@ def status():
         'house_state': house_state,
     })
 
-# ─────────────────────────────────────────────
-# MAIN
-# ─────────────────────────────────────────────
+
+
+print('=' * 50)
+print('IOT House server → https://localhost:5000')
+print(f'Arduino : {ARDUINO_PORT} @ {ARDUINO_BAUD}')
+print(f'Ollama  : {OLLAMA_URL} ({OLLAMA_MODEL})')
+print(f'TTS dir : {TTS_DIR}')
+print('=' * 50)
+
+init_arduino()
+
+
 if __name__ == '__main__':
-    threading.Thread(target=init_arduino, daemon=True).start()
 
-    print('=' * 50)
-    print('IOT House server → https://localhost:5000')
-    print(f'Arduino : {ARDUINO_PORT} @ {ARDUINO_BAUD}')
-    print(f'Ollama  : {OLLAMA_URL} ({OLLAMA_MODEL})')
-    print(f'TTS dir : {TTS_DIR}')
-    print('=' * 50)
-
-    app.run(host='0.0.0.0', port=5000, debug=False,
-        ssl_context=('cert.pem', 'key.pem'))
+    app.run(host='0.0.0.0', port=5000, debug=False)

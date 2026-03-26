@@ -1,6 +1,6 @@
 // LED Salon RGB
 const int LED_R = 2;
-const int LED_G = 3;
+const int LED_G = 8;
 const int LED_B = 4;
 
 // LEDs simples
@@ -10,7 +10,7 @@ const int LED_CUISINE = 7;
 // LED Chambre RGB
 const int LED_CHAMBRE_R = 10;
 const int LED_CHAMBRE_G = 11;
-const int LED_CHAMBRE_B = 12;
+const int LED_CHAMBRE_B = 3;
 
 // Moteur 1 : Ventilateur
 const int M1_IN1 = 9;
@@ -142,7 +142,7 @@ void loop() {
     }
 
     // ── Moteur 1 : Ventilateur ──
-    else if (msg == "allumerMoteur" || msg == "MOTOR") {
+    else if (msg == "allumerVentilo") {
       analogWrite(M1_IN1, 75);
       //digitalWrite(M1_IN2, LOW);
       Serial.println("OK:MOTOR1_ON");
@@ -157,7 +157,7 @@ void loop() {
       //digitalWrite(M1_IN2, LOW);
       Serial.println("OK:MOTOR1_FAST");
     }
-    else if (msg == "eteindreMoteur" || msg == "MOTOR_OFF") {
+    else if (msg == "eteindreVentilo") {
       digitalWrite(M1_IN1, LOW);
       //digitalWrite(M1_IN2, LOW);
       Serial.println("OK:MOTOR1_OFF");

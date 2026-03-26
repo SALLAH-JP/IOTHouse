@@ -19,7 +19,7 @@ const windowClass = {
 
 const commands = {
   salon:          { on: 'allumerLed',       off: 'eteindreLed'       },
-  fan:            { on: 'allumerMoteur',    off: 'eteindreMoteur'    },
+  fan:            { on: 'allumerVentilo',   off: 'eteindreVentilo'    },
   'garage-light': { on: 'allumerLedGarage', off: 'eteindreLedGarage' },
   'garage-door':  { on: 'ouvrirGarage',     off: 'fermerGarage'      },
   chambre:        { on: 'allumerLedChambre',off: 'eteindreLedChambre' },
@@ -90,31 +90,17 @@ document.querySelectorAll('.room-card').forEach(card => {
 });
 
 // ── FAN ──
-let fanSlowTimer = null;
-let fanInitialized = false;
 function animateFan(on) {
   const group  = document.getElementById('fan-group');
   const blades = document.getElementById('fan-blades');
   if (!group || !blades) return;
-  clearTimeout(fanSlowTimer);
 
   if (on) {
-    fanInitialized = true;
     group.style.opacity = '1';
-    blades.classList.remove('slow');
     blades.classList.add('spinning');
   } else {
-    if (!fanInitialized) {
-      // Premier chargement — pas d'animation, juste éteindre
-      group.style.opacity = '0.35';
-      return;
-    }
     blades.classList.remove('spinning');
-    blades.classList.add('slow');
-    fanSlowTimer = setTimeout(() => {
-      blades.classList.remove('slow');
-      group.style.opacity = '0.35';
-    }, 1400);
+    group.style.opacity = '0.35';
   }
 }
 
