@@ -58,13 +58,13 @@ void loop() {
     Serial.print("RECU:"); Serial.println(msg);
 
     // ── LED Salon RGB ──
-    if (msg == "allumerLed" || msg == "LED") {
+    if (msg == "allumerSalon" || msg == "LED") {
       digitalWrite(LED_R, LOW);
       digitalWrite(LED_G, LOW);
       digitalWrite(LED_B, LOW);
       Serial.println("OK:LED_SALON_ON");
     }
-    else if (msg == "eteindreLed" || msg == "LED_OFF") {
+    else if (msg == "eteindreSalon" || msg == "LED_OFF") {
       digitalWrite(LED_R, HIGH);
       digitalWrite(LED_G, HIGH);
       digitalWrite(LED_B, HIGH);
@@ -89,30 +89,40 @@ void loop() {
       Serial.println("OK:SALON_BLEU");
     }
     else if (msg == "salonBlanc") {
-      digitalWrite(LED_R, L0W);
+      digitalWrite(LED_R, LOW);
       digitalWrite(LED_G, LOW);
       digitalWrite(LED_B, LOW);
       Serial.println("OK:SALON_BLANC");
     }
 
     // ── LEDs simples ──
-    else if (msg == "allumerLedChambre") {
+    else if (msg == "allumerChambre") {
       digitalWrite(LED_CHAMBRE_R, LOW);
       digitalWrite(LED_CHAMBRE_G, LOW);
       digitalWrite(LED_CHAMBRE_B, LOW);
       Serial.println("OK:LED_CHAMBRE_ON");
     }
-    else if (msg == "eteindreLedChambre") {
+    else if (msg == "eteindreChambre") {
       digitalWrite(LED_CHAMBRE_R, HIGH);
       digitalWrite(LED_CHAMBRE_G, HIGH);
       digitalWrite(LED_CHAMBRE_B, HIGH);
       Serial.println("OK:LED_CHAMBRE_OFF");
     }
-    else if (msg == "allumerLedCuisine") {
+    else if (msg.startsWith("allumerChambre ")) {
+        int r = msg.substring(15, msg.indexOf(' ', 15)).toInt();
+        int reste = msg.indexOf(' ', 15) + 1;
+        int g = msg.substring(reste, msg.indexOf(' ', reste)).toInt();
+        int b = msg.substring(msg.lastIndexOf(' ') + 1).toInt();
+        analogWrite(LED_CHAMBRE_R, 255 - r);
+        analogWrite(LED_CHAMBRE_G, 255 - g);
+        analogWrite(LED_CHAMBRE_B, 255 - b);
+        Serial.println("OK:LED_CHAMBRE_RGB");
+    }
+    else if (msg == "allumerCuisine") {
       digitalWrite(LED_CUISINE, LOW);
       Serial.println("OK:LED_CUISINE_ON");
     }
-    else if (msg == "eteindreLedCuisine") {
+    else if (msg == "eteindreCuisine") {
       digitalWrite(LED_CUISINE, HIGH);
       Serial.println("OK:LED_CUISINE_OFF");
     }
@@ -143,12 +153,12 @@ void loop() {
 
     // ── Moteur 1 : Ventilateur ──
     else if (msg == "allumerVentilo") {
-      analogWrite(M1_IN1, 75);
+      analogWrite(M1_IN1, 50);
       //digitalWrite(M1_IN2, LOW);
       Serial.println("OK:MOTOR1_ON");
     }
     else if (msg == "ventiloLent") {
-      analogWrite(M1_IN1, 60);
+      analogWrite(M1_IN1, 20);
       //digitalWrite(M1_IN2, LOW);
       Serial.println("OK:MOTOR1_SLOW");
     }
@@ -165,7 +175,7 @@ void loop() {
 
     // ── Moteur 2 : Garage ──
     else if (msg == "ouvrirGarage") {
-      for (int i = 0; i < 100; i++) {
+      for (int i = 0; i < 80; i++) {
         analogWrite(M2_IN1, 75);
         digitalWrite(M2_IN2, LOW);
         delay(20);
@@ -175,7 +185,7 @@ void loop() {
       Serial.println("OK:GARAGE_OPEN");
     }
     else if (msg == "fermerGarage") {
-      for (int i = 0; i < 100; i++) {
+      for (int i = 0; i < 60; i++) {
         digitalWrite(M2_IN1, LOW);
         analogWrite(M2_IN2, 75);
         delay(20);

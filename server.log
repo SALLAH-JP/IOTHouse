@@ -1,0 +1,494 @@
+/bin/sh: 1: /home/pi/IOTHouse/iot/bin/python3: not found
+==================================================
+IOT House server → https://localhost:5000
+Arduino : /dev/ttyACM0 @ 115200
+Ollama  : http://localhost:11434/api/chat (mistral-large-3:675b-cloud)
+TTS dir : /home/pi/IOTHouse/tts_cache
+==================================================
+[Arduino] Connecté sur /dev/ttyACM0 ✓
+[Voice] "allume la chambre"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"C'est fait !","action":"allumerChambre"}
+```
+[Arduino] ← allumerChambre
+[Arduino] → RECU:allumerChambre
+[Voice] "ouvre le garage"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Porte du garage en cours d'ouverture.","action":"ouvrirGarage"}
+```
+[Arduino] ← ouvrirGarage
+[Arduino] → RECU:ouvrirGarage
+[Arduino] ← fermerGarage
+[Arduino] → RECU:fermerGarage
+[Arduino] ← ouvrirGarage
+[Arduino] → OK:GARAGE_CLOSE
+[Arduino] ← fermerGarage
+[Arduino] → RECU:fermerGarage
+[Arduino] ← ouvrirGarage
+[Arduino] → RECU:ouvrirGarage
+[Arduino] ← fermerGarage
+[Arduino] → RECU:fermerGarage
+[Voice] "ça roule le garage"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"Parfait ! La porte du garage est bien ouverte."}
+```
+[Voice] "où le garage"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"Le garage se trouve à l'extérieur de la maison, généralement accessible depuis l'allée ou le côté de la propriété."}
+```
+[Voice] "ouvre le garage"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Ouverture du garage en cours.","action":"ouvrirGarage"}
+```
+[Arduino] ← ouvrirGarage
+[Arduino] → RECU:ouvrirGarage
+[Voice] "ouvre le garage"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Le garage est déjà en train de s'ouvrir.","action":""}
+```
+[Voice] "ouvre le quand même je te dis"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Relance de l'ouverture du garage.","action":"ouvrirGarage"}
+```
+[Arduino] ← ouvrirGarage
+[Arduino] → RECU:ouvrirGarage
+[Voice] "et maintenant tu peux le fermer fils de chien"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Fermeture du garage enclenchée.","action":"fermerGarage"}
+```
+[Arduino] ← fermerGarage
+[Arduino] → RECU:fermerGarage
+[Voice] "allume tout"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Toutes les lumières et le ventilateur allumés.","action":"allumerTout"}
+```
+[Arduino] ← allumerTout
+[Arduino] → RECU:allumerTout
+[Voice] "ouais ralenti un peu la vitesse du ventilateur"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Ventilateur en mode lent.","action":"ventiloLent"}
+```
+[Arduino] ← ventiloLent
+[Arduino] → RECU:ventiloLent
+[Voice] "au maximum"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Ventilateur en mode rapide.","action":"ventiloRapide"}
+```
+[Arduino] ← ventiloRapide
+[Arduino] → RECU:ventiloRapide
+[Voice] "on se voit c'est bon état"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"Super ! N'hésite pas si tu as besoin d'autre chose dans la maison."}
+```
+[Voice] "ouais et toi maintenant"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"Je suis toujours opérationnel et prêt à gérer ta maison connectée ! 😊"}
+```
+[Voice] "batteur"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"Je ne gère pas les appareils de cuisine comme un batteur, désolé ! Mais je peux allumer la lumière de la cuisine en rouge si besoin."}
+```
+[Voice] "éteins le vol"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Ventilateur éteint.","action":"eteindreVentilo"}
+```
+[Arduino] ← eteindreVentilo
+[Arduino] → RECU:eteindreVentilo
+[Voice] "éteins tout"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Tout est éteint.","action":"eteindreTout"}
+```
+[Arduino] ← eteindreTout
+[Arduino] → RECU:eteindreTout
+[Voice] "salut ça va"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"Salut ! Je vais bien, merci. Et toi, comment ça va ?"}
+```
+[Voice] "ça va bien tu vois qu'est-ce que tu sais faire"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"Je peux gérer les lumières (salon, chambre, cuisine), le ventilateur, et la porte du garage. Je contrôle aussi les couleurs en RGB pour la chambre. Besoin d'aide ?"}
+```
+==================================================
+IOT House server → https://localhost:5000
+Arduino : /dev/ttyACM0 @ 115200
+Ollama  : http://localhost:11434/api/chat (mistral-large-3:675b-cloud)
+TTS dir : /home/pi/IOTHouse/tts_cache
+==================================================
+[Arduino] Connecté sur /dev/ttyACM0 ✓
+[Voice] "oui ça va"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"Super ! Comment puis-je t'aider avec la maison aujourd'hui ?"}
+```
+[Voice] "en fait"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"D'accord, dis-moi ce que tu veux faire ou savoir."}
+```
+[Voice] "allume la lumière de la chambre allez je te laisse choisir la couleur"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Lumière chambre en mauve !","action":"allumerChambre 161 113 136"}
+```
+[Arduino] ← allumerChambre 161 113 136
+[Arduino] → RECU:allumerChambre 161 113 136
+[Voice] "encore la couleur j'aime pas trop"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Lumière chambre en turquoise !","action":"allumerChambre 64 224 208"}
+```
+[Arduino] ← allumerChambre 64 224 208
+[Arduino] → RECU:allumerChambre 64 224 208
+[Voice] "ouvre le garage"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Garage en cours d'ouverture.","action":"ouvrirGarage"}
+```
+[Arduino] ← ouvrirGarage
+[Arduino] → RECU:ouvrirGarage
+[Voice] "ouvre le garage"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Le garage est déjà en train de s'ouvrir ou est ouvert.","action":""}
+```
+[Voice] "ouvre le garage"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"J'ouvre la porte du garage.","action":"ouvrirGarage"}
+```
+[Arduino] ← ouvrirGarage
+[Arduino] → RECU:ouvrirGarage
+[Voice] "maintenant ferme le garage"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Fermeture du garage en cours.","action":"fermerGarage"}
+```
+[Arduino] ← fermerGarage
+[Arduino] → RECU:fermerGarage
+[Voice] "allume tout maintenant"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Toutes les lumières et le ventilateur sont allumés.","action":"allumerTout"}
+```
+[Arduino] ← allumerTout
+[Arduino] → RECU:allumerTout
+[Voice] "ok tu peux ça va pas allumer"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"D'accord, je n'allume rien alors. Que puis-je faire d'autre pour vous ?"}
+```
+[Voice] "et tant que je voulais dire"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"Pas de problème ! Je reste à l'écoute si vous souhaitez ajuster l'éclairage ou autre chose."}
+```
+[Voice] "éteins tout"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Tout est éteint.","action":"eteindreTout"}
+```
+[Arduino] ← eteindreTout
+[Arduino] → RECU:eteindreTout
+[Arduino] ← allumerChambre
+[Arduino] → RECU:allumerChambre
+[Arduino] ← allumerChambre
+[Arduino] → RECU:allumerChambre
+[Arduino] ← allumerChambre
+[Arduino] → RECU:allumerChambre
+[Arduino] ← allumerCuisine
+[Arduino] → RECU:allumerCuisine
+[Voice] "allume la lumière de la cuisine"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Lumière de la cuisine allumée en rouge.","action":"allumerCuisine"}
+```
+[Arduino] ← allumerCuisine
+[Arduino] → RECU:allumerCuisine
+[Arduino] ← allumerSalon
+[Arduino] → RECU:allumerSalon
+[Arduino] ← allumerChambre
+[Arduino] → RECU:allumerChambre
+[Arduino] ← allumerSalon
+[Arduino] → RECU:allumerSalon
+[Voice] "éteins la lumière de la cuisine"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Lumière de la cuisine éteinte.","action":"eteindreCuisine"}
+```
+[Arduino] ← eteindreCuisine
+[Arduino] → RECU:eteindreCuisine
+[Voice] "salut maintenant"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"Bonjour ! Comment puis-je vous aider avec la maison aujourd'hui ?"}
+```
+[Voice] "à libre maintenant"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"D'accord ! Je reste disponible si vous avez besoin d'ajuster les lumières, le ventilateur ou autre chose."}
+```
+[Voice] "cuisine"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Lumière de la cuisine en rouge allumée.","action":"allumerCuisine"}
+```
+[Arduino] ← allumerCuisine
+[Arduino] → RECU:allumerCuisine
+[Voice] "tout maintenant"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Tout est allumé : lumières et ventilateur.","action":"allumerTout"}
+```
+[Arduino] ← allumerTout
+[Arduino] → RECU:allumerTout
+[Voice] "éteins tout maintenant"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Tout est éteint : lumières et ventilateur.","action":"eteindreTout"}
+```
+[Arduino] ← eteindreTout
+[Arduino] → RECU:eteindreTout
+[Arduino] ← allumerSalon
+[Arduino] → RECU:allumerSalon
+[Arduino] ← allumerSalon
+[Arduino] → RECU:allumerSalon
+[Arduino] ← allumerSalon
+[Arduino] → RECU:allumerSalon
+[Arduino] ← allumerSalon
+[Arduino] → RECU:allumerSalon
+[Arduino] ← allumerVentilo
+[Arduino] → RECU:allumerVentilo
+[Arduino] ← eteindreVentilo
+[Arduino] → RECU:eteindreVentilo
+[Arduino] ← allumerVentilo
+[Arduino] → RECU:allumerVentilo
+[Arduino] ← eteindreVentilo
+[Arduino] → RECU:eteindreVentilo
+[Arduino] ← allumerVentilo
+[Arduino] → RECU:allumerVentilo
+[Arduino] ← eteindreVentilo
+[Arduino] → RECU:eteindreVentilo
+[Arduino] ← allumerSalon
+[Arduino] → RECU:allumerSalon
+[Arduino] ← ouvrirGarage
+[Arduino] → RECU:ouvrirGarage
+[Arduino] ← fermerGarage
+[Arduino] → RECU:fermerGarage
+[Arduino] ← allumerChambre
+[Arduino] → RECU:allumerChambre
+[Arduino] ← allumerCuisine
+[Arduino] → RECU:allumerCuisine
+[Arduino] ← allumerSalon
+[Arduino] → RECU:allumerSalon
+[Arduino] ← allumerSalon
+[Arduino] → RECU:allumerSalon
+[Arduino] ← allumerSalon
+[Arduino] → RECU:allumerSalon
+==================================================
+IOT House server → https://localhost:5000
+Arduino : /dev/ttyACM0 @ 115200
+Ollama  : http://localhost:11434/api/chat (mistral-large-3:675b-cloud)
+TTS dir : /home/pi/IOTHouse/tts_cache
+==================================================
+[Arduino] Connecté sur /dev/ttyACM0 ✓
+[Arduino] ← allumerSalon
+[Arduino] → RECU:allumerSalon
+[Arduino] ← allumerVentilo
+[Arduino] → RECU:allumerVentilo
+[Arduino] ← eteindreVentilo
+[Arduino] → RECU:eteindreVentilo
+[Arduino] ← allumerVentilo
+[Arduino] → RECU:allumerVentilo
+[Arduino] ← eteindreVentilo
+[Arduino] → RECU:eteindreVentilo
+[Arduino] ← ouvrirGarage
+[Arduino] → RECU:ouvrirGarage
+[Arduino] ← fermerGarage
+[Arduino] → RECU:fermerGarage
+[Arduino] ← allumerChambre
+[Arduino] → RECU:allumerChambre
+[Arduino] ← allumerCuisine
+[Arduino] → RECU:allumerCuisine
+[Voice] "dans tout"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"J'allume tout.","action":"allumerTout"}
+```
+[Arduino] ← allumerTout
+[Arduino] → RECU:allumerTout
+[Voice] "éteins tout"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"J'éteins tout.","action":"eteindreTout"}
+```
+[Arduino] ← eteindreTout
+[Arduino] → RECU:eteindreTout
+[Voice] "et ouvre le garage aussi"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Garage ouvert.","action":"ouvrirGarage"}
+```
+[Arduino] ← ouvrirGarage
+[Arduino] → RECU:ouvrirGarage
+[Voice] "d'accord merci beaucoup"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"Avec plaisir ! N'hésitez pas si vous avez besoin d'autre chose."}
+```
+[Arduino] ← fermerGarage
+[Arduino] → RECU:fermerGarage
+[Arduino] ← allumerVentilo
+[Arduino] → RECU:allumerVentilo
+[Arduino] ← eteindreVentilo
+[Arduino] → RECU:eteindreVentilo
+[Arduino] ← allumerCuisine
+[Arduino] → RECU:allumerCuisine
+[Arduino] ← eteindreCuisine
+[Arduino] → RECU:eteindreCuisine
+[Arduino] ← allumerChambre
+[Arduino] → RECU:allumerChambre
+[Arduino] ← eteindreChambre
+[Arduino] → RECU:eteindreChambre
+[Voice] "allume la lumière de la chambre"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Lumière de la chambre allumée en blanc.","action":"allumerChambre"}
+```
+[Arduino] ← allumerChambre
+[Arduino] → RECU:allumerChambre
+[Voice] "change un peu la couleur"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Voici un joli mauve pour la chambre.","action":"allumerChambre 161 113 136"}
+```
+[Arduino] ← allumerChambre 161 113 136
+[Arduino] → RECU:allumerChambre 161 113 136
+[Voice] "ouais ça va pas la couleur"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"Dites-moi une couleur ou donnez-moi un code RGB (ex: 255 100 50 pour orange)."}
+```
+[Voice] "je l'ai choisi"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Couleur personnalisée appliquée à la chambre.","action":"allumerChambre"}
+```
+[Arduino] ← allumerChambre
+[Arduino] → RECU:allumerChambre
+[Voice] "mets-moi un peu un peu vif"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Voici une teinte plus vive pour la chambre !","action":"allumerChambre 255 50 150"}
+```
+[Arduino] ← allumerChambre 255 50 150
+[Arduino] → RECU:allumerChambre 255 50 150
+[Voice] "un bleu plutôt tu vives que ça"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Bleu électrique activé !","action":"allumerChambre 0 128 255"}
+```
+[Arduino] ← allumerChambre 0 128 255
+[Arduino] → RECU:allumerChambre 0 128 255
+[Voice] "et du rose"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Rose vif en place !","action":"allumerChambre 255 20 147"}
+```
+[Arduino] ← allumerChambre 255 20 147
+[Arduino] → RECU:allumerChambre 255 20 147
+[Voice] "c'est bon tu peux éteindre la lumière"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Lumière de la chambre éteinte.","action":"eteindreChambre"}
+```
+[Arduino] ← eteindreChambre
+[Arduino] → RECU:eteindreChambre
+[Voice] "ouais ouais ouais ok ok allume la lumière"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Lumière du salon allumée en blanc.","action":"allumerSalon"}
+```
+[Arduino] ← allumerSalon
+[Arduino] → RECU:allumerSalon
+[Voice] "change la lumière du salon"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"En quelle couleur souhaitez-vous mettre la lumière du salon ? (rouge, vert, bleu ou blanc)"}
+```
+[Voice] "en rouge"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Lumière du salon en rouge.","action":"salonRouge"}
+```
+[Arduino] ← salonRouge
+[Arduino] → RECU:salonRouge
+[Voice] "éteins maintenant"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Tout est éteint.","action":"eteindreTout"}
+```
+[Arduino] ← eteindreTout
+[Arduino] → RECU:eteindreTout
+[Voice] "allume la lumière du salon"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Lumière du salon allumée en blanc.","action":"allumerSalon"}
+```
+[Arduino] ← allumerSalon
+[Arduino] → RECU:allumerSalon
+[Voice] "change la lumière du salon"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"En quelle couleur souhaitez-vous mettre la lumière du salon ? (rouge, vert, bleu ou blanc)"}
+```
+[Voice] "rouge"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Lumière du salon en rouge.","action":"salonRouge"}
+```
+[Arduino] ← salonRouge
+[Arduino] → RECU:salonRouge
+[Voice] "éteins maintenant"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Tout est éteint.","action":"eteindreTout"}
+```
+[Arduino] ← eteindreTout
+[Arduino] → RECU:eteindreTout
+[Voice] "allume le ventilateur"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Ventilateur allumé en mode par défaut.","action":"allumerVentilo"}
+```
+[Arduino] ← allumerVentilo
+[Arduino] → RECU:allumerVentilo
+[Voice] "change la vitesse du ventilateur"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"Souhaitez-vous le mode lent ou rapide pour le ventilateur ?"}
+```
+[Voice] "rapide"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Ventilateur en mode rapide.","action":"ventiloRapide"}
+```
+[Arduino] ← ventiloRapide
+[Arduino] → RECU:ventiloRapide
+[Voice] "et tu as maintenant"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"Le ventilateur est déjà en mode rapide. Que puis-je faire d'autre pour vous ?"}
+```
+[Voice] "éteins maintenant le ventilateur"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Ventilateur éteint.","action":"eteindreVentilo"}
+```
+[Arduino] ← eteindreVentilo
+[Arduino] → RECU:eteindreVentilo
+[Voice] "ouvre le garage"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Porte du garage en cours d'ouverture.","action":"ouvrirGarage"}
+```
+[Arduino] ← ouvrirGarage
+[Arduino] → RECU:ouvrirGarage
+[Voice] "ferme le garage"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Fermeture de la porte du garage.","action":"fermerGarage"}
+```
+[Arduino] ← fermerGarage
+[Arduino] → RECU:fermerGarage
+[Voice] "allume la lumière de la chambre"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Lumière de la chambre allumée en blanc.","action":"allumerChambre"}
+```
+[Arduino] ← allumerChambre
+[Arduino] → RECU:allumerChambre
+[Voice] "change la couleur"
+[Ollama] raw: ```json
+{"type":"chat","reponse":"Quelle couleur souhaitez-vous pour la chambre ? Donnez-moi un code RGB ou un nom de couleur (ex: mauve, bleu ciel)."}
+```
+[Voice] "je te laisse choisir"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Lumière de la chambre en violet doux.","action":"allumerChambre 147 112 219"}
+```
+[Arduino] ← allumerChambre 147 112 219
+[Arduino] → RECU:allumerChambre 147 112 219
+[Voice] "choisis encore une autre couleur s'il"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Lumière de la chambre en turquoise.","action":"allumerChambre 64 224 208"}
+```
+[Arduino] ← allumerChambre 64 224 208
+[Arduino] → RECU:allumerChambre 64 224 208
+[Voice] "tu peux allumer la couleur de la lumière de la cuisine maintenant"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Cuisine en rouge comme demandé.","action":"allumerCuisine"}
+```
+[Arduino] ← allumerCuisine
+[Arduino] → RECU:allumerCuisine
+[Voice] "éteins tout"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Tout est éteint.","action":"eteindreTout"}
+```
+[Arduino] ← eteindreTout
+[Arduino] → RECU:eteindreTout
+[Voice] "allume tout"
+[Ollama] raw: ```json
+{"type":"commande","reponse":"Toutes les lumières et le ventilateur sont allumés.","action":"allumerTout"}
+```

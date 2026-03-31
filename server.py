@@ -5,13 +5,17 @@ Lancer : python3 server.py
 Ouvrir : https://localhost:5000
 """
 
+
+import re
 import os
 import json
 import time
 import threading
 import subprocess
 import requests
+from gtts import gTTS
 from flask import Flask, request, jsonify, send_from_directory
+
 
 app = Flask(__name__, static_folder='.')
 
@@ -42,14 +46,14 @@ house_state = {
 }
 
 ACTION_STATE = {
-    'allumerLed':         ('salon',        True),
-    'eteindreLed':        ('salon',        False),
-    'allumerLedChambre':  ('chambre',      True),
-    'eteindreLedChambre': ('chambre',      False),
-    'allumerLedCuisine':  ('cuisine',      True),
-    'eteindreLedCuisine': ('cuisine',      False),
-    'allumerLedGarage':   ('garage-light', True),
-    'eteindreLedGarage':  ('garage-light', False),
+    'allumerSalon':         ('salon',        True),
+    'eteindreSalon':        ('salon',        False),
+    'allumerChambre':  ('chambre',      True),
+    'eteindreChambre': ('chambre',      False),
+    'allumerCuisine':  ('cuisine',      True),
+    'eteindreCuisine': ('cuisine',      False),
+    'allumerGarage':   ('garage-light', True),
+    'eteindreGarage':  ('garage-light', False),
     'allumerVentilo':     ('fan',          True),
     'eteindreVentilo':    ('fan',          False),
     'ventiloLent':        ('fan',          True),
@@ -66,28 +70,29 @@ SYSTEM_PROMPT = """Tu es un assistant domotique pour une maison connectée.
 Réponds UNIQUEMENT en JSON valide, sans texte avant ni après, sans balises markdown, avec une seul action.
 
 Si c'est une commande domotique, réponds :
-{"type":"commande","reponse":"<confirmation courte>","action":"<action>"}
+{"type":"commande","reponse":"<confirmation un peu courte>","action":"<action>"}
 
 Actions disponibles :
-- allumerLed
-- eteindreLed
-- allumerLedChambre
-- eteindreLedChambre
-- allumerLedCuisine
-- eteindreLedCuisine
-- allumerTout
-- eteindreTout
-- salonRouge
-- salonVert
-- salonBleu
-- salonBlanc
-- allumerVentilo
-- eteindreVentilo
-- ventiloLent
-- ventiloRapide
-- ouvrirGarage
-- fermerGarage
+- allumerSalon : pour allumer la lumière du salon en blanc
+- eteindreSalon : pour éteindre la lumière de la chanbre
+- allumerChambre : pour allumer la lumière de la chambre en blanc
+- eteindreChambre : pour éteindre le lumière de la chambre
+- allumerCuisine : pour allumer la lumière de la cuisine uniquement en rouge
+- eteindreCuisine : pour éteindre la lumière de la cuisine
+- allumerTout : pour allumer toutes les lumières et le ventilateur
+- eteindreTout : pour éteindre toutes les lumières et le ventilateur
+- salonRouge : pour allumer la lumière du salon en rouge
+- salonVert : pour allumer la lumière du salon en vert
+- salonBleu : pour allumer la lumière du salon en bleu
+- allumerVentilo : pour allumer le ventilateur dans le salon dans le mode par défaut
+- eteindreVentilo : pour éteindre le ventilateur dans salon
+- ventiloLent : pour allumer le ventilateur en mode lent dans salon
+- ventiloRapide : pour allumer le ventilateur en mode rapide dans salon
+- ouvrirGarage : pour ouvrir la porte du garage
+- fermerGarage : pour fermer la porte du garage
 
+Autres : Pour la chambre et uniquement pour la chambre tu peux spécifier un code RGB si l'utilisateur veut allumer la lumière de la chambre dans une couleur particulière, exemple pour du mauve:
+{"type":"commande", "reponse":"<confirmation un peu courte>","action":"allumerChambre 161 113 136"
 Si ce n'est pas une commande, réponds :
 {"type":"chat","reponse":"<réponse moyennement courte en français>"}"""
 
@@ -128,34 +133,43 @@ def send_to_arduino(cmd: str):
 # ─────────────────────────────────────────────
 # TTS
 # ─────────────────────────────────────────────
-def generate_tts(text: str):
+def clean_tts_text(text: str) -> str:
+    # Supprimer les caractères problématiques
+    text = text.replace('?', '').replace('!', '')
+    text = text.replace('...', ' ').replace('..', ' ')
+    text = re.sub(r'[^\w\s,.\'-àâäéèêëîïôùûüç]', '', text, flags=re.UNICODE)
+    return text.strip()
+
+def generate_tts2(text: str):
     try:
         filename = f'tts_{int(time.time()*1000)}.wav'
         filepath = os.path.join(TTS_DIR, filename)
 
-        script = f"""
-import pyttsx3, sys
-e = pyttsx3.init()
-e.setProperty('rate', 160)
-voices = e.getProperty('voices')
-for v in voices:
-    if 'fr' in v.id.lower() or 'french' in v.name.lower():
-        e.setProperty('voice', v.id)
-        break
-e.save_to_file({json.dumps(text)}, {json.dumps(filepath)})
-e.runAndWait()
-"""
-        result = subprocess.run(['python3', '-c', script], timeout=15, capture_output=True)
+        subprocess.run(
+            ['espeak-ng', '-v', 'fr', '-s', '140', '-w', filepath, text],
+            timeout=10, capture_output=True
+        )
 
         if os.path.exists(filepath):
             return f'/tts/{filename}'
-        else:
-            print(f'[TTS] Fichier non généré. stderr: {result.stderr.decode()}')
-            return None
+        return None
 
     except Exception as e:
         print(f'[TTS] Erreur : {e}')
         return None
+
+def generate_tts(text: str):
+    try:
+        filename = f'tts_{int(time.time()*1000)}.mp3'
+        filepath = os.path.join(TTS_DIR, filename)
+        gTTS(text=text, lang='fr').save(filepath)
+        if os.path.exists(filepath):
+            return f'/tts/{filename}'
+        return None
+    except Exception as e:
+        print(f'[TTS] Erreur : {e}')
+        return None
+
 
 # ─────────────────────────────────────────────
 # OLLAMA
@@ -218,14 +232,16 @@ def send_text():
 
     # Màj house_state + envoyer à l'Arduino
     if action:
-        if action == 'allumerTout':
+        base_action = action.split()[0]
+
+        if base_action == 'allumerTout':
             for r in ['salon', 'chambre', 'cuisine', 'fan']:
                 house_state[r] = True
-        elif action == 'eteindreTout':
+        elif base_action == 'eteindreTout':
             for r in ['salon', 'chambre', 'cuisine', 'fan']:
                 house_state[r] = False
-        elif action in ACTION_STATE:
-            room, on = ACTION_STATE[action]
+        elif base_action in ACTION_STATE:
+            room, on = ACTION_STATE[base_action]
             house_state[room] = on
         send_to_arduino(action)
 

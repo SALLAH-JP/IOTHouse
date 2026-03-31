@@ -18,12 +18,12 @@ const windowClass = {
 };
 
 const commands = {
-  salon:          { on: 'allumerLed',       off: 'eteindreLed'       },
+  salon:          { on: 'allumerSalon',       off: 'eteindreSalon'       },
   fan:            { on: 'allumerVentilo',   off: 'eteindreVentilo'    },
   'garage-light': { on: 'allumerLedGarage', off: 'eteindreLedGarage' },
   'garage-door':  { on: 'ouvrirGarage',     off: 'fermerGarage'      },
-  chambre:        { on: 'allumerLedChambre',off: 'eteindreLedChambre' },
-  cuisine:        { on: 'allumerLedCuisine',off: 'eteindreLedCuisine' },
+  chambre:        { on: 'allumerChambre',off: 'eteindreChambre' },
+  cuisine:        { on: 'allumerCuisine',off: 'eteindreCuisine' },
 };
 
 // ── Appliquer l'état reçu du serveur sur l'UI ──
