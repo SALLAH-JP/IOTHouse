@@ -1,31 +1,95 @@
+<div align="center">
+
 # 🏠 IOTHouse
 
-Maison connectée pilotée par la voix, tournant entièrement en local sur une **Raspberry Pi 4**.  
-L'assistant vocal comprend vos commandes, les interprète via un LLM, et pilote les composants électroniques (LEDs, moteur DC) via Arduino.
+### *Maison connectée pilotée par la voix*
+
+**Interface web vocale qui comprend vos commandes via un LLM et pilote les composants électroniques de votre maison via Arduino.**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-HTTPS-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-4-C51A4A?logo=raspberrypi&logoColor=white)](https://www.raspberrypi.org/)
+[![Arduino](https://img.shields.io/badge/Arduino-Uno-00979D?logo=arduino&logoColor=white)](https://www.arduino.cc/)
+[![Ollama](https://img.shields.io/badge/LLM-Mistral%20Large-7B68EE)](https://ollama.com/)
+
+[**🎥 Voir la démo**](#-démonstration) · [**🚀 Installation**](#-installation) · [**📖 Documentation**](#-utilisation)
+
+</div>
 
 ---
 
-## 📐 Architecture du projet
+## 📺 Démonstration
+
+> 🎬 **[▶️ Cliquez ici pour voir IOTHouse en action sur YouTube](https://youtu.be/fMAOpTnzdqo)**
+
+[![IOTHouse Demo](https://img.youtube.com/vi/fMAOpTnzdqo/maxresdefault.jpg)](https://youtu.be/fMAOpTnzdqo)
+
+*Démonstration du pilotage vocal d'une maison miniature : éclairage RGB par pièce, ventilateur, porte de garage, commandés en langage naturel.*
+
+---
+
+## 📋 Sommaire
+
+- [À propos](#-à-propos)
+- [Fonctionnalités](#-fonctionnalités)
+- [Architecture](#%EF%B8%8F-architecture)
+- [Matériel requis](#-matériel-requis)
+- [Structure du projet](#-structure-du-projet)
+- [Installation](#-installation)
+- [Lancement](#%EF%B8%8F-lancement)
+- [Utilisation](#-utilisation)
+- [Format des réponses LLM](#-format-des-réponses-llm)
+- [Actions disponibles](#-actions-disponibles)
+- [API HTTP](#-api-http)
+- [Licence](#-licence)
+
+---
+
+## 🎯 À propos
+
+IOTHouse est un projet personnel d'**interface web vocale pour maison connectée**. L'utilisateur parle dans son navigateur, sa voix est transcrite en texte, le texte est envoyé à un **LLM cloud** qui décide s'il s'agit d'une commande ou d'une conversation, puis l'action est exécutée sur un **Arduino** qui pilote les composants électroniques de la maison.
+
+Le projet explore l'intégration de **Grands Modèles de Langage** dans des objets du quotidien pour offrir une **interaction naturelle** avec le matériel embarqué — un terrain d'expérimentation qui a servi de base au projet plus ambitieux [MARC](https://github.com/SALLAH-JP/MARC) (mon projet de fin de licence).
+
+---
+
+## ✨ Fonctionnalités
+
+- 🎙️ **Reconnaissance vocale dans le navigateur** via la Web Speech API (aucun modèle à installer)
+- 🧠 **LLM Mistral Large** via Ollama Cloud pour la compréhension du langage naturel
+- 📋 **Sortie JSON structurée** : le LLM distingue automatiquement commande domotique et conversation
+- 🔊 **Synthèse vocale** des réponses via **gTTS** (Google Text-to-Speech)
+- 💡 **Pilotage Arduino** : LEDs RGB (couleurs personnalisables pour la chambre), ventilateur, porte garage
+- 🌐 **Interface web HTTPS** accessible depuis tous les appareils du réseau
+- 🔄 **Historique conversationnel** (6 derniers échanges) pour des dialogues cohérents
+- 📊 **Suivi d'état temps réel** de chaque pièce côté serveur
+
+---
+
+## 🏗️ Architecture
 
 ```
-IOTHouse/
-├── Local-Voice/
-│   ├── voice_assistant.py     # Pipeline vocal principal (STT → LLM → TTS)
-│   ├── va_config.json         # Configuration (micro, modèle, voix...)
-│   ├── vosk-model/            # Modèle de reconnaissance vocale (Vosk)
-│   ├── voices/                # Modèles de synthèse vocale (Piper .onnx)
-│   └── bin/piper/             # Binaire Piper TTS
-│
-├── matrixLed/
-│   └── gif_viewer.py          # Affichage de GIFs sur matrice LED RGB (rpi-rgb-led-matrix)
-│
-├── web/
-│   ├── index.html             # Interface web de la maison
-│   ├── style.css              # Styles de l'interface
-│   └── app.js                 # Logique JS (contrôles + appels backend)
-│
-└── Arduino/
-    └── IOTHouse.ino           # Code Arduino (LED RGB + Moteur DC)
+┌─────────────────────────────────────────────┐
+│  Navigateur                                 │
+│  index.html · app.js · style.css            │
+│  Web Speech API (STT)                       │
+└──────────────────┬──────────────────────────┘
+                   │ HTTPS · /send_text · /command
+                   ▼
+┌─────────────────────────────────────────────┐
+│  Raspberry Pi 4 · server.py                 │
+│  Flask HTTPS · gestion d'état maison        │
+│  gTTS pour la synthèse vocale               │
+└────────┬──────────────────────────┬─────────┘
+         │                          │
+         │ HTTP                     │ Série
+         ▼                          ▼
+┌─────────────────────┐    ┌────────────────────┐
+│  Ollama Cloud       │    │  Arduino Uno       │
+│  Mistral Large      │    │  LEDs · Moteurs    │
+│  Sortie JSON        │    │  /dev/ttyACM0      │
+└─────────────────────┘    └────────────────────┘
 ```
 
 ---
@@ -33,26 +97,35 @@ IOTHouse/
 ## 🔧 Matériel requis
 
 | Composant | Détail |
-|-----------|--------|
-| Raspberry Pi 4 | 8 GB RAM recommandé |
-| Arduino (Uno / Nano) | Connexion USB |
-| LED RGB | Anodes communes ou cathodes |
-| Pont en H L298N | Pilotage moteur DC |
-| Moteur DC | Ventilateur / portail garage |
-| Matrice LED RGB | 64×32, compatible rpi-rgb-led-matrix |
-| Micro USB | Compatible PyAudio |
-| Haut-parleur | Sortie audio via ALSA |
+| --- | --- |
+| Raspberry Pi 4 | Pour faire tourner le serveur Flask |
+| Arduino Uno | Connexion USB sur la Pi |
+| LEDs (R, G, B) | 6 pièces : salon, chambre, cuisine, garage |
+| Moteur DC | Ventilateur du salon |
+| Moteur DC ou servo | Porte du garage |
+| Pont en H L298N | Pilotage des moteurs DC |
+| Microphone | Compatible navigateur (USB ou intégré) |
+| Haut-parleur | Sortie audio pour la voix de l'assistant |
 
-### Câblage Arduino
+---
 
-| Composant | Broche Arduino |
-|-----------|---------------|
-| LED Rouge | Pin 9 (PWM) |
-| LED Verte | Pin 10 (PWM) |
-| LED Bleue | Pin 11 (PWM) |
-| Moteur IN1 | Pin 5 |
-| Moteur IN2 | Pin 6 |
-| Moteur EN  | Pin 3 (PWM) |
+## 📁 Structure du projet
+
+```
+.
+├── IOTHouse/              # Code Arduino
+│   └── IOTHouse.ino       # Sketch (LEDs + Moteur DC + porte garage)
+│
+├── server.py              # Serveur Flask HTTPS
+├── index.html             # Interface web de la maison
+├── app.js                 # Logique JS (STT navigateur + appels API)
+├── style.css              # Styles de l'interface
+├── Modelfile              # Configuration du LLM Ollama
+├── requirements.txt       # Dépendances Python
+├── cert.pem               # Certificat SSL (à générer)
+├── key.pem                # Clé privée SSL (à NE PAS commit)
+└── LICENSE                # Licence MIT
+```
 
 ---
 
@@ -62,170 +135,180 @@ IOTHouse/
 
 ```bash
 sudo apt update
-sudo apt install python3-dev python3-pip sox portaudio19-dev -y
+sudo apt install python3-pip openssl -y
 ```
 
-### 2. Environnement Python
+### 2. Dépendances Python
 
 ```bash
-python3 -m venv env --system-site-packages
-source env/bin/activate
-pip install vosk ollama pyaudio pydub soxr numpy requests
+pip install -r requirements.txt
 ```
 
-> `--system-site-packages` est nécessaire pour accéder à `rgbmatrix` installé sur le système.
+Les principales libs utilisées : `Flask`, `requests`, `gTTS`, `pyserial`.
 
-### 3. Matrice LED RGB (rpi-rgb-led-matrix)
+### 3. Ollama Cloud
 
-```bash
-sudo apt install python3-dev cython3 -y
-make build-python
-sudo make install-python
-```
-
-### 4. Piper TTS
-
-Télécharger le binaire Piper et le placer dans `bin/piper/` :
-
-```bash
-mkdir -p bin/piper
-# Télécharger depuis https://github.com/rhasspy/piper/releases
-# Placer le binaire dans bin/piper/piper
-```
-
-Télécharger un modèle de voix `.onnx` dans le dossier `voices/`.
-
-### 5. Vosk (reconnaissance vocale)
-
-Télécharger un modèle Vosk dans `vosk-model/` :
-
-```bash
-# Modèle français léger recommandé :
-# https://alphacephei.com/vosk/models → vosk-model-small-fr-0.22
-```
-
-### 6. Ollama + modèle LLM
+Le projet utilise **Mistral Large via Ollama Cloud** (`mistral-large-3:675b-cloud`).
 
 ```bash
 # Installer Ollama
 curl -fsSL https://ollama.com/install.sh | sh
 
-# Modèle recommandé pour Pi 4 8GB (JSON strict, rapide)
-ollama pull qwen2.5:3b
-
-# Créer le modèle personnalisé avec le Modelfile
-ollama create robot-assistant -f Modelfile
+# Se connecter à Ollama Cloud (clé API requise)
+export OLLAMA_API_KEY="<votre_clé>"
+export OLLAMA_HOST="https://ollama.com"
 ```
 
-### 7. Arduino
+> 💡 Tu peux aussi utiliser un modèle local en remplaçant `OLLAMA_MODEL` dans `server.py` par exemple par `mistral` ou `qwen2.5:3b` pour une exécution 100% locale.
+
+### 4. Arduino
+
+Uploader le sketch `IOTHouse/IOTHouse.ino` sur l'Arduino via l'IDE Arduino ou `arduino-cli` :
 
 ```bash
-# Installer arduino-cli
-curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
-sudo mv bin/arduino-cli /usr/local/bin/
-
-# Installer le core Arduino
 arduino-cli core install arduino:avr
-
-# Compiler et uploader
-arduino-cli compile --fqbn arduino:avr:uno Arduino/IOTHouse/
-arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:uno Arduino/IOTHouse/
+arduino-cli compile --fqbn arduino:avr:uno IOTHouse/
+arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:uno IOTHouse/
 ```
+
+### 5. Certificat SSL
+
+HTTPS est obligatoire pour accéder au microphone depuis le navigateur. Générer un certificat auto-signé :
+
+```bash
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+```
+
+> ⚠️ **Ne jamais commit `key.pem`** sur GitHub — c'est ta clé privée. Vérifier qu'elle est dans `.gitignore`.
 
 ---
 
 ## ▶️ Lancement
 
 ```bash
-# Depuis le dossier Local-Voice
-source env/bin/activate
-sudo env/bin/python3 voice_assistant.py
+python3 server.py
 ```
 
-> `sudo` est nécessaire pour accéder à la matrice LED RGB (GPIO).
+Le serveur démarre sur `https://localhost:5000` (et `https://<ip-pi>:5000` depuis tout le réseau local).
 
-### Interface web
+Le navigateur affichera un avertissement de sécurité dû au certificat auto-signé — c'est normal sur un réseau local, accepter l'exception.
 
-```bash
-cd web/
-python3 -m http.server 8080
-# Ouvrir http://[ip-raspberry]:8080
+### Démarrage automatique au boot
+
+Ajouter dans `crontab -e` :
+
 ```
-
----
-
-## ⚙️ Configuration (`va_config.json`)
-
-```json
-{
-  "volume": 9,
-  "mic_name": "Plantronics",
-  "audio_output_device": "Plantronics",
-  "model_name": "robot-assistant",
-  "voice": "fr_FR-upmc-medium.onnx",
-  "enable_audio_processing": false,
-  "history_length": 4,
-  "system_prompt": "Tu es un assistant embarqué dans une maison connectée."
-}
+@reboot cd /chemin/vers/IOTHouse && python3 server.py
 ```
 
 ---
 
-## 🤖 Format des réponses LLM (Modelfile)
+## 📖 Utilisation
 
-Le modèle répond **uniquement en JSON** selon deux formats :
+### Commande vocale
 
-**Commande :**
+1. Ouvrir l'interface dans le navigateur
+2. Cliquer sur le bouton micro
+3. Énoncer une commande, par exemple :
+   - *« Allume la lumière du salon »*
+   - *« Mets la chambre en mauve »*
+   - *« Ouvre la porte du garage »*
+   - *« Éteins tout »*
+   - *« Mets le ventilateur en mode rapide »*
+
+L'assistant confirme oralement et exécute la commande sur l'Arduino.
+
+### Commande clic
+
+L'interface SVG de la maison permet de cliquer directement sur chaque pièce pour l'allumer/éteindre, sans passer par la voix.
+
+### Conversation
+
+Si la requête n'est pas une commande domotique, le LLM répond simplement par la voix sans actionner le matériel. Exemple :
+- *« Quelle heure est-il ? »*
+- *« Raconte-moi une blague »*
+
+---
+
+## 🤖 Format des réponses LLM
+
+Le LLM est contraint de répondre **uniquement en JSON valide**, selon deux formats :
+
+### Commande domotique
+
 ```json
 {
   "type": "commande",
   "reponse": "Ok, j'allume le salon",
-  "action": "avancer",
-  "paramètres": { "distance": 100 }
+  "action": "allumerSalon"
 }
 ```
 
-**Discussion :**
+### Couleur RGB pour la chambre
+
+```json
+{
+  "type": "commande",
+  "reponse": "Voilà ta chambre en mauve",
+  "action": "allumerChambre 161 113 136"
+}
+```
+
+### Conversation libre
+
 ```json
 {
   "type": "chat",
-  "reponse": "Bonjour ! Comment puis-je vous aider ?"
+  "reponse": "Il est 14h32 actuellement."
 }
 ```
 
-### Actions disponibles
+---
+
+## 🎛️ Actions disponibles
 
 | Action | Description |
-|--------|-------------|
-| `avancer` | Avancer d'une distance |
-| `reculer` | Reculer |
-| `aller a droite` | Tourner à droite |
-| `aller a gauche` | Tourner à gauche |
-| `aller a un endroit x` | Aller à une destination |
-| `se mettre en veille` | Mode veille |
-| `changer le style d'yeux` | Changer l'expression |
+| --- | --- |
+| `allumerSalon` / `eteindreSalon` | Lumière du salon (blanc par défaut) |
+| `salonRouge` / `salonVert` / `salonBleu` | Salon en couleur fixe |
+| `allumerChambre` / `eteindreChambre` | Lumière de la chambre |
+| `allumerChambre <R> <G> <B>` | Chambre en couleur RGB personnalisée |
+| `allumerCuisine` / `eteindreCuisine` | Lumière de la cuisine (rouge par défaut) |
+| `allumerGarage` / `eteindreGarage` | Lumière du garage |
+| `ouvrirGarage` / `fermerGarage` | Porte du garage motorisée |
+| `allumerVentilo` / `eteindreVentilo` | Ventilateur du salon |
+| `ventiloLent` / `ventiloRapide` | Vitesse du ventilateur |
+| `allumerTout` / `eteindreTout` | Toutes les pièces et le ventilateur |
 
 ---
 
-## 🌐 Interface Web
+## 🌐 API HTTP
 
-L'interface affiche une illustration SVG de la maison avec les commandes associées.
+| Route | Méthode | Description |
+| --- | --- | --- |
+| `/` | GET | Interface web (`index.html`) |
+| `/send_text` | POST | Pipeline vocal : `{ "user_text": "allume le salon" }` |
+| `/command` | POST | Commande directe : `{ "command": "allumerSalon" }` |
+| `/status` | GET | État courant : Arduino, modèle, état des pièces |
+| `/tts/<filename>` | GET | Servir un fichier audio TTS généré |
 
-| Contrôle | Commande Arduino |
-|----------|-----------------|
-| Salon — Lumière | `LED` / `LED_OFF` |
-| Salon — Ventilateur | `MOTOR` / `MOTOR_OFF` |
-| Garage — Lumière | `LED` / `LED_OFF` |
-| Garage — Porte | `MOTOR` / `MOTOR_OFF` |
-| Chambre | `LED` / `LED_OFF` |
-| Cuisine | `LED` / `LED_OFF` |
+### Réponse type de `/send_text`
 
-Le backend doit exposer deux routes :
-
-```python
-POST /command   →  { "command": "LED" }
-POST /voice     →  { "text": "allume le salon" }
-GET  /status    →  { "salon": true, "chambre": false, ... }
+```json
+{
+  "ai_reply": "Ok, j'allume le salon",
+  "action": "allumerSalon",
+  "type": "commande",
+  "tts_url": "/tts/tts_1737054321000.mp3",
+  "house_state": {
+    "salon": true,
+    "chambre": false,
+    "cuisine": false,
+    "garage-light": false,
+    "garage-door": false,
+    "fan": false
+  }
+}
 ```
 
 ---
@@ -233,52 +316,72 @@ GET  /status    →  { "salon": true, "chambre": false, ... }
 ## 🔌 Pipeline vocal
 
 ```
-Micro
-  │
-  ▼
-Vosk (STT)          ← reconnaissance vocale locale, modèle français
-  │
-  ▼
-Ollama / qwen2.5    ← LLM local, répond en JSON
-  │
-  ├─ type: commande → sendToArduino() via /dev/ttyACM0
-  │
-  └─ type: chat     → Piper (TTS) → haut-parleur
+Navigateur
+   │
+   ▼
+Web Speech API (STT)   ← reconnaissance vocale native du navigateur
+   │
+   ▼ POST /send_text
+Flask server.py
+   │
+   ▼ HTTP
+Mistral Large (Ollama Cloud)   ← LLM, sortie JSON contrainte
+   │
+   ├── type: commande  → série vers Arduino via /dev/ttyACM0
+   │                      + mise à jour de house_state
+   │
+   └── type: chat      → gTTS → fichier MP3 → renvoyé au navigateur
+                                   │
+                                   ▼
+                            Lecture dans le navigateur
 ```
 
 ---
 
 ## 🐛 Dépannage
 
-**`ModuleNotFoundError: No module named 'rgbmatrix'`**
-→ Utiliser `sudo env/bin/python3` pour accéder aux packages système.
-
-**`ModuleNotFoundError: No module named 'vosk'`**
-→ Bien activer l'environnement avec `source env/bin/activate` avant de lancer avec `sudo`.
-
 **`could not open port /dev/ttyACM0`**
-→ Vérifier le port avec `ls /dev/ttyACM* /dev/ttyUSB*`. Remplacer dans le code si nécessaire.
+→ Vérifier le port avec `ls /dev/ttyACM* /dev/ttyUSB*` et adapter `ARDUINO_PORT` dans `server.py`.
 
-**Arduino ne reçoit pas les commandes**
-→ Vérifier que le baud rate est identique dans le code Python (`115200`) et dans le sketch Arduino (`Serial.begin(115200)`).
+**Le microphone ne s'active pas dans le navigateur**
+→ Le HTTPS est obligatoire. Vérifier que `cert.pem` et `key.pem` sont bien présents et que tu accèdes à `https://` (pas `http://`).
 
----
+**Erreur Ollama : 401 / 403**
+→ Vérifier que `OLLAMA_API_KEY` est correctement exporté avant de lancer `server.py`.
 
-## 📋 Dépendances Python
-
-```
-vosk
-ollama
-pyaudio
-pydub
-soxr
-numpy
-requests
-pyserial
-```
+**Pas de son lors de la réponse**
+→ gTTS nécessite un accès Internet. Vérifier la connexion. Sinon basculer vers `espeak-ng` (fonction `generate_tts2` déjà présente dans le code).
 
 ---
 
-## 📄 Licence
+## 👤 Auteur
 
-MIT
+**SALLAH Assiongbon Théodore Jean-Paul**
+Étudiant en 3ème année — Licence Informatique Appliquée
+🎓 Université des Mascareignes (Maurice)
+
+[![GitHub](https://img.shields.io/badge/GitHub-SALLAH--JP-181717?logo=github)](https://github.com/SALLAH-JP)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Jean--Paul%20SALLAH-0A66C2?logo=linkedin)](https://www.linkedin.com/in/jeanpaul-sallah/)
+
+---
+
+## 🙏 Remerciements
+
+- [Ollama](https://ollama.com) et le modèle **Mistral Large**
+- [Flask](https://flask.palletsprojects.com)
+- [gTTS](https://github.com/pndurette/gTTS) — Google Text-to-Speech (interface Python non officielle)
+- [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API) — reconnaissance vocale navigateur
+
+---
+
+## 📜 Licence
+
+Ce projet est distribué sous licence **MIT** — voir le fichier [`LICENSE`](LICENSE).
+
+---
+
+<div align="center">
+
+*Si ce projet vous a plu, n'hésitez pas à laisser une ⭐ !*
+
+</div>
