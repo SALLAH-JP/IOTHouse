@@ -48,9 +48,9 @@
 
 ## 🎯 À propos
 
-IOTHouse est un projet personnel d'**interface web vocale pour maison connectée**. L'utilisateur parle dans son navigateur, sa voix est transcrite en texte, le texte est envoyé à un **LLM cloud** qui décide s'il s'agit d'une commande ou d'une conversation, puis l'action est exécutée sur un **Arduino** qui pilote les composants électroniques de la maison.
+IOTHouse est un **projet de groupe** d'**interface web vocale pour maison connectée**, développé à 3 dans le cadre académique à l'UDM. L'utilisateur parle dans son navigateur, sa voix est transcrite en texte, le texte est envoyé à un **LLM cloud** qui décide s'il s'agit d'une commande ou d'une conversation, puis l'action est exécutée sur un **Arduino** qui pilote les composants électroniques de la maison.
 
-Le projet explore l'intégration de **Grands Modèles de Langage** dans des objets du quotidien pour offrir une **interaction naturelle** avec le matériel embarqué — un terrain d'expérimentation qui a servi de base au projet plus ambitieux [MARC](https://github.com/SALLAH-JP/MARC) (mon projet de fin de licence).
+Le projet explore l'intégration de **Grands Modèles de Langage** dans des objets du quotidien pour offrir une **interaction naturelle** avec le matériel embarqué — un terrain d'expérimentation qui a servi de base au projet plus ambitieux [MARC](https://github.com/SALLAH-JP/MARC) (mon projet de fin de licence, en solo cette fois).
 
 ---
 
@@ -354,14 +354,17 @@ Mistral Large (Ollama Cloud)   ← LLM, sortie JSON contrainte
 
 ---
 
-## 👤 Auteur
+## 👥 Équipe
 
-**SALLAH Assiongbon Théodore Jean-Paul**
-Étudiant en 3ème année — Licence Informatique Appliquée
-🎓 Université des Mascareignes (Maurice)
+Projet de groupe réalisé dans le cadre académique à l'**Université des Mascareignes** (Maurice), par 3 étudiants en 3ème année de Licence en Informatique Appliquée.
 
-[![GitHub](https://img.shields.io/badge/GitHub-SALLAH--JP-181717?logo=github)](https://github.com/SALLAH-JP)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Jean--Paul%20SALLAH-0A66C2?logo=linkedin)](https://www.linkedin.com/in/jeanpaul-sallah/)
+| Membre | Liens |
+|--------|-------|
+| **SALLAH Assiongbon Théodore Jean-Paul** | [![GitHub](https://img.shields.io/badge/GitHub-SALLAH--JP-181717?logo=github)](https://github.com/SALLAH-JP) [![LinkedIn](https://img.shields.io/badge/LinkedIn-Jean--Paul%20SALLAH-0A66C2?logo=linkedin)](https://www.linkedin.com/in/jeanpaul-sallah/) |
+| **RAKOTOMAVO Ny Vetso** | [![GitHub](https://img.shields.io/badge/GitHub-vetsojkr-181717?logo=github)](https://github.com/vetsojkr) |
+| **RAZAFINDRATSIMBA Angelin Fehizoro** | [![GitHub](https://img.shields.io/badge/GitHub-angelin57-181717?logo=github)](https://github.com/angelin57) |
+
+🎓 Université des Mascareignes — Maurice
 
 ---
 
