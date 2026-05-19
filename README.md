@@ -40,7 +40,7 @@
 - [Lancement](#%EF%B8%8F-lancement)
 - [Utilisation](#-utilisation)
 - [Format des réponses LLM](#-format-des-réponses-llm)
-- [Actions disponibles](#-actions-disponibles)
+- [Actions disponibles](#%EF%B8%8F-actions-disponibles)
 - [API HTTP](#-api-http)
 - [Licence](#-licence)
 
@@ -265,7 +265,7 @@ Le LLM est contraint de répondre **uniquement en JSON valide**, selon deux form
 
 ---
 
-## 🎛️ Actions disponibles
+## 🎛️ Actions disponibles 
 
 | Action | Description |
 | --- | --- |
